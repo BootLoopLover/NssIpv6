@@ -1,40 +1,74 @@
+# Deteksi failsafe mode
 [ -e /tmp/.failsafe ] && export FAILSAFE=1
 
-[ -f /etc/banner ] && cat /etc/banner
-[ -n "$FAILSAFE" ] && cat /etc/banner.failsafe
+# ================= Tambahan Info Device =================
+# Ambil informasi sistem untuk info device
+MODEL=$(cat /proc/device-tree/model 2>/dev/null || echo "Unknown")
+OPENWRT_VERSION=$(grep 'DISTRIB_RELEASE=' /etc/openwrt_release | cut -d"'" -f2)
+KERNEL_VERSION=$(uname -r)
+ARCH=$(uname -m)
+DATE_NOW=$(date "+%d-%m-%Y")
+TIME_NOW=$(date "+%H:%M:%S")
+RAW_HWID=$(ip link show | awk '/ether/ {print $2; exit}')
+HWID_HASH=$(echo -n "$RAW_HWID" | sha256sum | cut -d ' ' -f1)
+HOSTNAME_FIRMWARE=$(cat /proc/sys/kernel/hostname 2>/dev/null || hostname)
 
+# Warna hijau, kuning & reset warna
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+# Tampilkan info device di terminal
+printf "\n${GREEN}"
+echo "   🚀  © Project by Pakalolo 🚀"
+echo "╔═════════════════════════════════╗"
+echo "║        DEVICE INFORMATION       ║"
+echo "╚═════════════════════════════════╝"
+printf "🏷️  %-10s : %s\n" "Hostname" "$HOSTNAME_FIRMWARE"
+printf "🖥️  %-10s : %s\n" "Device" "$MODEL"
+printf "⚙️  %-10s : %s\n" "OpenWrt" "$OPENWRT_VERSION"
+printf "🔁  %-10s : %s\n" "Kernel" "$KERNEL_VERSION"
+printf "📆  %-10s : %s\n" "Date" "$DATE_NOW"
+printf "🕐  %-10s : %s\n" "Time" "$TIME_NOW"
+echo "══════════════════════════════════"
+echo " Type ota or menu Then Press Enter....."
+echo -e "══════════════════════════════════${NC}"
+# =========================================================
+
+# Cek apakah overlay filesystem read-only (biasanya storage penuh)
 grep -Fsq '/ overlay ro,' /proc/mounts && {
-	echo 'Your JFFS2-partition seems full and overlayfs is mounted read-only.'
-	echo 'Please try to remove files from /overlay/upper/... and reboot!'
+    echo 'Your JFFS2-partition seems full and overlayfs is mounted read-only.'
+    echo 'Please try to remove files from /overlay/upper/... and reboot!'
 }
 
-export PATH="%PATH%"
+# Set environment dasar
+export PATH="/usr/sbin:/usr/bin:/sbin:/bin"
 export HOME=$(grep -e "^${USER:-root}:" /etc/passwd | cut -d ":" -f 6)
 export HOME=${HOME:-/root}
 export PS1='\u@\h:\w\$ '
 export ENV=/etc/shinit
 
+# Ubah judul terminal jika pakai xterm/rxvt
 case "$TERM" in
-	xterm*|rxvt*)
-		export PS1='\[\e]0;\u@\h: \w\a\]'$PS1
-		;;
+    xterm*|rxvt*)
+        export PS1='\[\e]0;\u@\h: \w\a\]'$PS1
+        ;;
 esac
 
+# Load skrip tambahan di /etc/profile.d kalau bukan failsafe
 [ -n "$FAILSAFE" ] || {
-	for FILE in /etc/profile.d/*.sh; do
-		[ -e "$FILE" ] && . "$FILE"
-	done
-	unset FILE
+    for FILE in /etc/profile.d/*.sh; do
+        [ -e "$FILE" ] && . "$FILE"
+    done
+    unset FILE
 }
 
+# Peringatan kalau root belum punya password
 if ( grep -qs '^root::' /etc/shadow && \
      [ -z "$FAILSAFE" ] )
 then
+# Pesan tambahan kuning
 cat << EOF
-=== WARNING! =====================================
-There is no root password defined on this device!
-Use the "passwd" command to set up a new password
-in order to prevent unauthorized SSH logins.
---------------------------------------------------
+
 EOF
 fi
