@@ -31,7 +31,7 @@ printf "🔁  %-10s : %s\n" "Kernel" "$KERNEL_VERSION"
 printf "📆  %-10s : %s\n" "Date" "$DATE_NOW"
 printf "🕐  %-10s : %s\n" "Time" "$TIME_NOW"
 echo "══════════════════════════════════"
-echo " Type ota or menu Then Press Enter....."
+echo " Type ota or menu Then Press Enter"
 echo -e "══════════════════════════════════${NC}"
 # =========================================================
 
