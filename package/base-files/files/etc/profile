@@ -20,7 +20,8 @@ NC='\033[0m'
 
 # Tampilkan info device di terminal
 printf "\n${GREEN}"
-echo "   🚀  © Project by Pakalolo 🚀"
+[ -f /etc/banner ] && cat /etc/banner
+[ -n "$FAILSAFE" ] && cat /etc/banner.failsafe
 echo "╔═════════════════════════════════╗"
 echo "║        DEVICE INFORMATION       ║"
 echo "╚═════════════════════════════════╝"
@@ -62,13 +63,3 @@ esac
     done
     unset FILE
 }
-
-# Peringatan kalau root belum punya password
-if ( grep -qs '^root::' /etc/shadow && \
-     [ -z "$FAILSAFE" ] )
-then
-# Pesan tambahan kuning
-cat << EOF
-
-EOF
-fi
