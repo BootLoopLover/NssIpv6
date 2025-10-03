@@ -2,7 +2,7 @@
 . /usr/share/libubox/jshn.sh
 
 # 默认WIFI设置
-BASE_SSID='OpenWrt'
+BASE_SSID='AW1000'
 BASE_POWER='auto'
 
 # 获取无线设备的数量
