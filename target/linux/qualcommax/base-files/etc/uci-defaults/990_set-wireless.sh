@@ -3,7 +3,6 @@
 
 # 默认WIFI设置
 BASE_SSID='OpenWrt'
-BASE_WORD='12345678'
 BASE_POWER='auto'
 
 # 获取无线设备的数量
@@ -43,8 +42,7 @@ configure_wifi() {
 #	uci set wireless.radio${radio}.mu_beamformer='1'
 
 	uci set wireless.default_radio${radio}.ssid=${ssid}
-	uci set wireless.default_radio${radio}.key=${BASE_WORD}
-	uci set wireless.default_radio${radio}.encryption='psk2+ccmp'
+	uci set wireless.default_radio${radio}.encryption='none'
 	uci set wireless.default_radio${radio}.ieee80211k='1'
 	uci set wireless.default_radio${radio}.time_advertisement='2'
 	uci set wireless.default_radio${radio}.time_zone='CST-8'
