@@ -85,15 +85,12 @@ query_mode() {
 FIRST_5G=''
 set_wifi_def_cfg() {
 	local band=$(uci get wireless.radio${1}.band)
-	local path=$(uci get wireless.radio${1}.path)
-	local htmode=$(query_mode "$path")
-	local channel=6
 	local ssid="$BASE_SSID"
 
 	case "$band" in
 	'5g')
 		channel=149
-		[ "$htmode" = 'HE160' ] || [ "$htmode" = 'VHT160' ] && channel=44
+		htmode="HE80"
 		if [ -z "$FIRST_5G" ]; then
 			[ "$RADIO_NUM" -gt 2 ] && ssid="${BASE_SSID}_5G-1" || ssid="${BASE_SSID}_5G"
 			FIRST_5G=1
@@ -101,12 +98,9 @@ set_wifi_def_cfg() {
 			ssid="${BASE_SSID}_5G-2"
 		fi
 		;;
-	*)
-		case "$htmode" in
-		'HT40' | 'VHT40' | 'HE40')
-			htmode="${htmode%40}20"
-			;;
-		esac
+	'2g')
+		channel=11
+		htmode="HE40"
 		;;
 	esac
 
